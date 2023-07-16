@@ -1,17 +1,25 @@
 import express from 'express';
+import { config } from 'dotenv';
+import pg from 'pg'
 
-// Crear una nueva aplicación Express
+config()
+
 const app = express();
+const pool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL
+})
 
-// Definir un puerto para nuestro servidor
 const port = 3000 || process.env.PORT;
 
-// Definir una ruta de prueba
 app.get('/', (req, res) => {
   res.send('¡Hola Mundo!');
 });
 
-// Iniciar el servidor
+app.get('/ping', async (req, res) => {
+  const result = await pool.query('SELECT NOW()')
+  res.json(result.rows[0]);
+});
+
 app.listen(port, () => {
   console.log(`Servidor escuchando en http://localhost:${port}`);
 });
